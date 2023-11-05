@@ -28,6 +28,7 @@ cursor1.execute("select * from cliente")
 
 for i in cursor1:
     clientes.append(i)
+print(clientes)
 conexion.close()
 #conexion base de datos--------------------------------
 
