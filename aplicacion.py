@@ -17,6 +17,7 @@ clientes=[]
 for i in cursor:
     proveedores.append(i)
 conexion.close()
+#----------------------------------------------------------------------------
 
 conexion= mysql.connector.connect(host='localhost',
                                   user='genaro',
@@ -41,11 +42,11 @@ def home(request, response):
 @app.ruta("/proveedores")
 def otra(request, response):
     response.text = app.template(
-    "site.html", context={"title": "Pagina secundaria", "user": "Lista de Proveedores","proveedor":proveedores})
+    "proveedores.html", context={"title": "Pagina secundaria", "user": "Lista de Proveedores","proveedor":proveedores})
         
         
 
 @app.ruta("/clientes")
 def ultima(request, response):
     response.text = app.template(
-    "site.html", context={"title": "Clientes", "user": "Lista de clientes","cliente":clientes})
+    "clientes.html", context={"title": "Clientes", "user": "Lista de clientes","cliente":clientes})
