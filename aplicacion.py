@@ -13,6 +13,7 @@ cursor.execute("select * from proveedores")
 
 proveedores=[]
 clientes=[]
+productos=[]
 
 for i in cursor:
     proveedores.append(i)
@@ -28,9 +29,23 @@ cursor1.execute("select * from cliente")
 
 for i in cursor1:
     clientes.append(i)
-print(clientes)
+
 conexion.close()
 #conexion base de datos--------------------------------
+#----------------------------------------------------------------------------
+conexion= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+cursor2=conexion.cursor()
+cursor2.execute("select * from cliente")
+
+for i in cursor2:
+    productos.append(i)
+conexion.close()
+
+
+#----------------------------------------------------------------------------
 
 
 app = Wsgiclass()
@@ -45,9 +60,13 @@ def otra(request, response):
     response.text = app.template(
     "proveedores.html", context={"title": "Pagina secundaria", "user": "Lista de Proveedores","proveedor":proveedores})
         
-        
 
 @app.ruta("/clientes")
 def ultima(request, response):
     response.text = app.template(
     "clientes.html", context={"title": "Clientes", "user": "Lista de clientes","cliente":clientes})
+
+@app.ruta("/productos")
+def productos(request, response):
+    response.text = app.template(
+        "productos.html",context={"title": "Productos en stock","user": "Lista de productos"})
