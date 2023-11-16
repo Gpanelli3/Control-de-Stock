@@ -16,7 +16,6 @@ cursor.execute("select * from proveedores")
 proveedores=[]
 for i in cursor:
     proveedores.append(i)
-#print(proveedores)
 conexion.close()
 #----------------------------------------------------------------------------
 conexion= mysql.connector.connect(host='localhost',
@@ -62,9 +61,9 @@ def cliente(request,response):
 def altaclientes(request, response):
 
     conexion= mysql.connector.connect(host='localhost',
-                                  user='genaro',
-                                  passwd='password',
-                                  database='stock_control')
+                                    user='genaro',
+                                    passwd='password',
+                                    database='stock_control')
     cursor3=conexion.cursor()
 
     nombre_cliente=request.POST.get('nombre')
@@ -81,23 +80,61 @@ def altaclientes(request, response):
     response.text=app.template(
         "altaclientes.html",context={"user": "Usuario Cargado"})
     
+
+
 @app.ruta("/bajaclientes")
-def bajaclientes(request,response):
+def bajacliente(request,response):
+
+    conexion= mysql.connector.connect(host='localhost',
+                                    user='genaro',
+                                    passwd='password',
+                                    database='stock_control')
+    cursor4=conexion.cursor()
+
+    id=request.POST.get('id')
+    dato_client=(id,)
+
+    sql="delete from cliente where cliente_id = %s"
+    datos=(dato_client)
+    cursor4.execute(sql,datos)
+    conexion.commit()
+    conexion.close()
+    
+    response.text = app.template(
+    "bajaclientes.html", context={"title": "Baja clientes", "user": "Genaro"})
+
+
+    
+
+
+@app.ruta("/productos")
+def productos(request, response):
+    productos=[]
     conexion= mysql.connector.connect(host='localhost',
                                   user='genaro',
                                   passwd='password',
                                   database='stock_control')
-    cursor4=conexion.cursor()
+    cursor=conexion.cursor()
+    cursor.execute("select id_producto,nombre,cantidad,precio_costo,precio_venta from stock")
 
-    #nombre=request.POST.get('nombre')
-    id=request.POST.get('id')
-
-    sql=("DELETE FROM cliente where cliente_id = %s",(id))
-    cursor4.execute(sql)
-    conexion.commit()
+    for i in cursor:
+        productos.append(i)
     conexion.close()
 
-@app.ruta("/productos")
-def productos(request, response):
     response.text = app.template(
-        "productos.html",context={"title": "Productos en stock","user": "Lista de productos"})
+        "productos.html",context={"title": "Productos en stock","user": "Lista de productos","producto":productos})
+    
+
+
+@app.ruta("/modificar")
+def modificar(request,response):
+    conexion= mysql.connector.connect(host='localhost',
+                                    user='genaro',
+                                    passwd='password',
+                                    database='stock_control')
+    cursor=conexion.cursor()
+
+    
+
+
+
