@@ -31,16 +31,13 @@
 <body>
     <h1>{{ user }} !!</h1>
 <div>
-    <h2 class='input'>Registro de Clientes </h2>
-    <form action="/altaclientes" method="post">
+    <h2 class='input'>Baja de Clientes </h2>
+    <form action="/bajaclientes" method="post">
         <label for="nombre">Nombre</label>
         <input type="text" id="nombre" name="nombre" required><br><br>
 
-        <label for="direccion">DNI:</label>
-        <input type="number" id="dni" name="dni"><br><br>
-
-        <label for="telefono">Telefono</label>
-        <input type="number" id="telefono" name="telefono"><br><br>
+        <label for="id">id</label>
+        <input type="number" id="id" name="id"><br><br>
         <button type="submit" class="btn bg-warning-subtle">Confirmar</button>
   </form>
   
