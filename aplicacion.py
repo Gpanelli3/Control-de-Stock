@@ -1,41 +1,6 @@
 import mysql.connector
 from jinja2 import environment
 from apiwsgi import Wsgiclass
-productos=[]
-
-#conexion base de datos--------------------------------
-conexion= mysql.connector.connect(host='localhost',
-                                  user='genaro',
-                                  passwd='password',
-                                  database='stock_control')
-cursor=conexion.cursor()
-cursor.execute("select * from proveedores")
-
-
-
-proveedores=[]
-for i in cursor:
-    proveedores.append(i)
-conexion.close()
-#----------------------------------------------------------------------------
-conexion= mysql.connector.connect(host='localhost',
-                                  user='genaro',
-                                  passwd='password',
-                                  database='stock_control')
-cursor2=conexion.cursor()
-
-
-clientes=[]
-cursor2.execute("select * from cliente")
-
-for i in cursor2:
-    clientes.append(i)
-#print(clientes)
-
-conexion.close()
-#----------------------------------------------------------------------------
-
-
 
 app = Wsgiclass()
 
@@ -46,14 +11,44 @@ def home(request, response):
 
 @app.ruta("/proveedores")
 def otra(request, response):
+    conexion= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor=conexion.cursor()
+    cursor.execute("select * from proveedores")
+
+    proveedores=[]
+    for i in cursor:
+        proveedores.append(i)
+    conexion.close()
+
     response.text = app.template(
     "proveedores.html", context={"title": "Pagina secundaria", "user": "Lista de Proveedores","proveedor":proveedores})
 
 
+
+
 @app.ruta("/clientes")
 def cliente(request,response):
-     response.text = app.template(
+    conexion= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor2=conexion.cursor()
+    clientes=[]
+    cursor2.execute("select * from cliente")
+
+    for i in cursor2:
+        clientes.append(i)
+    #print(clientes)
+
+    conexion.close()
+
+    response.text = app.template(
     "clientes.html", context={"title": "Clientes", "user": "Lista de clientes","cliente": clientes})
+
+
 
 
 
@@ -116,7 +111,7 @@ def productos(request, response):
                                   database='stock_control')
     cursor=conexion.cursor()
     cursor.execute("select id_producto,nombre,cantidad,precio_costo,precio_venta from stock")
-
+    productos=[]
     for i in cursor:
         productos.append(i)
     conexion.close()
