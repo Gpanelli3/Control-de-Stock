@@ -27,7 +27,24 @@ def otra(request, response):
     "proveedores.html", context={"title": "Pagina secundaria", "user": "Lista de Proveedores","proveedor":proveedores})
 
 
+@app.ruta("/altaprovee")
+def altaprovee(request,response):
+    conexion= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor=conexion.cursor()
 
+    nombre_proveedor=request.POST.get('nombre')
+    direccion=request.POST.get('direccion')
+    telefono=request.POST.get('telefono')
+
+    sql="INSERT INTO cliente (empresa,direccion,telefono) VALUES (%s,%s,%s)"
+    datos_proveedor=(nombre_proveedor,direccion,telefono)
+
+    cursor.execute(sql,datos_proveedor)
+    cursor.commit()
+    cursor.close()
 
 @app.ruta("/clientes")
 def cliente(request,response):
