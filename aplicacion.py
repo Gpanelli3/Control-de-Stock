@@ -11,7 +11,7 @@ conexion= mysql.connector.connect(host='localhost',
                                   database='stock_control')
 cursor2=conexion.cursor()
 clientes=[]
-cursor2.execute("select nombre,dni,telefono from cliente")
+cursor2.execute("select cliente_id, nombre,dni,telefono from cliente")
 
 for i in cursor2:
     clientes.append(i)
@@ -25,7 +25,7 @@ conexion= mysql.connector.connect(host='localhost',
                                   passwd='password',
                                   database='stock_control')
 cursor=conexion.cursor()
-cursor.execute("select empresa,direccion,telefono from proveedores")
+cursor.execute("select id_proveedor,empresa,direccion,telefono from proveedores")
 
 proveedores=[]
 for i in cursor:
@@ -34,16 +34,15 @@ conexion.close()
 #----------------------------------------------------PROVEEDORES
 
 #----------------------------------------------------PRODUCTOS
-productos=[]
 conexion= mysql.connector.connect(host='localhost',
                                   user='genaro',
                                   passwd='password',
                                   database='stock_control')
-cursor=conexion.cursor()
-cursor.execute("select id_producto,nombre,cantidad,precio_costo,precio_venta from stock")
-
+cursor3=conexion.cursor()
 productos=[]
-for i in cursor:
+cursor3.execute("select id_producto,nombre,cantidad,precio_costo,precio_venta from stock")
+
+for i in cursor3:
     productos.append(i)
 conexion.close()
 #----------------------------------------------------PRODUCTOS
