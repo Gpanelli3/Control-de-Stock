@@ -4,47 +4,38 @@ from apiwsgi import Wsgiclass
 
 app = Wsgiclass()
 
-#----------------------------------------------------CLIENTES
-conexion= mysql.connector.connect(host='localhost',
-                                  user='genaro',
-                                  passwd='password',
-                                  database='stock_control')
-cursor2=conexion.cursor()
+
 clientes=[]
-cursor2.execute("select cliente_id, nombre,dni,telefono from cliente")
-
-for i in cursor2:
-    clientes.append(i)
-#print(clientes)
-
-conexion.close()
+proveedores=[]
 #----------------------------------------------------CLIENTES
-#----------------------------------------------------PROVEEDORES
 conexion= mysql.connector.connect(host='localhost',
                                   user='genaro',
                                   passwd='password',
                                   database='stock_control')
 cursor=conexion.cursor()
-cursor.execute("select id_proveedor,empresa,direccion,telefono from proveedores")
+cursor.execute("select cliente_id, nombre,dni,telefono from cliente")
 
-proveedores=[]
 for i in cursor:
+    clientes.append(i)
+
+
+conexion.close()
+#----------------------------------------------------CLIENTES
+#----------------------------------------------------PROVEEDORES
+conexion= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+cursor2=conexion.cursor()
+cursor2.execute("select id_proveedor,empresa,direccion,telefono from proveedores")
+
+for i in cursor2:
     proveedores.append(i)
 conexion.close()
 #----------------------------------------------------PROVEEDORES
 
 #----------------------------------------------------PRODUCTOS
-conexion= mysql.connector.connect(host='localhost',
-                                  user='genaro',
-                                  passwd='password',
-                                  database='stock_control')
-cursor3=conexion.cursor()
-productos=[]
-cursor3.execute("select id_producto,nombre,cantidad,precio_costo,precio_venta from stock")
 
-for i in cursor3:
-    productos.append(i)
-conexion.close()
 #----------------------------------------------------PRODUCTOS
 
 
@@ -166,21 +157,48 @@ def bajacliente(request,response):
 
 @app.ruta("/productos")
 def productos(request, response):
+    conexion= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor3=conexion.cursor()
+    productos=[]
+    cursor3.execute("select id_producto,nombre,cantidad,precio_costo,precio_venta from stock")
+
+    for i in cursor3:
+        productos.append(i)
+    conexion.close()
 
     response.text = app.template(
         "productos.html",context={"title": "Productos en stock","user": "Lista de productos","producto":productos})
-    
 
 
-@app.ruta("/modificar")
-def modificar(request,response):
+
+@app.ruta("/agregarProducto")
+def agregarProducto(request,response):
+
     conexion= mysql.connector.connect(host='localhost',
-                                    user='genaro',
-                                    passwd='password',
-                                    database='stock_control')
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
     cursor=conexion.cursor()
 
+    id=request.POST.get('id')
+    nombre=request.POST.get('nombre')
+    proveedor=request.POST.get('proveedor')
+    cat=request.POST.get('categoria')
+    cantidad=request.POST.get('cantidad')
+    costo=request.POST.get('costo')
+    precio_venta=request.POST.get('venta')
+
+    sql="INSERT INTO stock (id_producto, nombre,id_proveedor,categoria,cantidad,precio_costo,precio_venta) VALUES(%s,%s,%s,%s,%s,%s,%s)"
+    datos_producto=(id,nombre,proveedor,cat,cantidad,costo,precio_venta)
+
+    cursor.execute(sql,datos_producto)
+    conexion.commit()
+    conexion.close()
+
+    response.text= app.template(
+        "agregarProducto.html", context={"title":"agregar Producto"})
+
     
-
-
-
