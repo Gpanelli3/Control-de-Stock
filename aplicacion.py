@@ -168,9 +168,11 @@ def productos(request, response):
     for i in cursor3:
         productos.append(i)
     conexion.close()
+    cont=len(productos)
+    print(cont)
 
     response.text = app.template(
-        "productos.html",context={"title": "Productos en stock","user": "Lista de productos","producto":productos})
+        "productos.html",context={"title": "Productos en stock","user": cont,"producto":productos})
 
 
 
@@ -182,6 +184,7 @@ def agregarProducto(request,response):
                                   passwd='password',
                                   database='stock_control')
     cursor=conexion.cursor()
+        
 
     id=request.POST.get('id')
     nombre=request.POST.get('nombre')
@@ -191,8 +194,12 @@ def agregarProducto(request,response):
     costo=request.POST.get('costo')
     precio_venta=request.POST.get('venta')
 
+    
+
     sql="INSERT INTO stock (id_producto, nombre,id_proveedor,categoria,cantidad,precio_costo,precio_venta) VALUES(%s,%s,%s,%s,%s,%s,%s)"
     datos_producto=(id,nombre,proveedor,cat,cantidad,costo,precio_venta)
+
+    
 
     cursor.execute(sql,datos_producto)
     conexion.commit()
@@ -202,3 +209,27 @@ def agregarProducto(request,response):
         "agregarProducto.html", context={"title":"agregar Producto"})
 
     
+@app.ruta("/borrarProducto")
+def borrarProducto(request,response):
+    conexion= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor=conexion.cursor()
+
+    
+    id=request.POST.get('id')
+    #nombre=request.POST.get('nombre')
+
+    datId=(id,)
+    #datCl=(nombre,)
+
+    sql="delete from stock where id_producto = %s"
+    datos=(datId)
+
+    cursor.execute(sql,datos)
+    conexion.commit()
+    conexion.close()
+
+    response.text=app.template(
+        "borrarProducto.html",context={"title":"Borrar Producto"})
