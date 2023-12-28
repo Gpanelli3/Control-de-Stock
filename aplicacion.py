@@ -5,38 +5,13 @@ from apiwsgi import Wsgiclass
 app = Wsgiclass()
 
 
-clientes=[]
-proveedores=[]
+
 #----------------------------------------------------CLIENTES
-conexion= mysql.connector.connect(host='localhost',
-                                  user='genaro',
-                                  passwd='password',
-                                  database='stock_control')
-cursor=conexion.cursor()
-cursor.execute("select cliente_id, nombre,dni,telefono from cliente")
 
-for i in cursor:
-    clientes.append(i)
-
-
-conexion.close()
 #----------------------------------------------------CLIENTES
 #----------------------------------------------------PROVEEDORES
-conexion= mysql.connector.connect(host='localhost',
-                                  user='genaro',
-                                  passwd='password',
-                                  database='stock_control')
-cursor2=conexion.cursor()
-cursor2.execute("select id_proveedor,empresa,direccion,telefono from proveedores")
 
-for i in cursor2:
-    proveedores.append(i)
-conexion.close()
 #----------------------------------------------------PROVEEDORES
-
-#----------------------------------------------------PRODUCTOS
-
-#----------------------------------------------------PRODUCTOS
 
 
 
@@ -47,6 +22,17 @@ def home(request, response):
 
 @app.ruta("/proveedores")
 def otra(request, response):
+    conexion= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor2=conexion.cursor()
+    cursor2.execute("select id_proveedor,empresa,direccion,telefono from proveedores")
+    
+    proveedores=[]
+    for i in cursor2:
+        proveedores.append(i)
+    conexion.close()
 
     response.text = app.template(
     "proveedores.html", context={"title": "Pagina secundaria", "user": "Lista de Proveedores","proveedor":proveedores})
@@ -98,6 +84,18 @@ def bajaprovee(request,response):
 
 @app.ruta("/clientes")
 def cliente(request,response):
+    conexion= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor=conexion.cursor()
+    cursor.execute("select cliente_id, nombre,dni,telefono from cliente")
+    clientes=[]
+    for i in cursor:
+        clientes.append(i)
+    conexion.close()
+
+
 
     response.text = app.template(
     "clientes.html", context={"title": "Clientes", "user": "Lista de clientes","cliente": clientes})
@@ -194,19 +192,19 @@ def agregarProducto(request,response):
     costo=request.POST.get('costo')
     precio_venta=request.POST.get('venta')
 
-    
-
     sql="INSERT INTO stock (id_producto, nombre,id_proveedor,categoria,cantidad,precio_costo,precio_venta) VALUES(%s,%s,%s,%s,%s,%s,%s)"
     datos_producto=(id,nombre,proveedor,cat,cantidad,costo,precio_venta)
-
     
-
     cursor.execute(sql,datos_producto)
     conexion.commit()
     conexion.close()
 
     response.text= app.template(
         "agregarProducto.html", context={"title":"agregar Producto"})
+
+    
+
+
 
     
 @app.ruta("/borrarProducto")
