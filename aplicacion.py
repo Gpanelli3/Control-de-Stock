@@ -6,15 +6,6 @@ app = Wsgiclass()
 
 
 
-#----------------------------------------------------CLIENTES
-
-#----------------------------------------------------CLIENTES
-#----------------------------------------------------PROVEEDORES
-
-#----------------------------------------------------PROVEEDORES
-
-
-
 @app.ruta("/home")
 def home(request, response):
     response.text = app.template(
@@ -175,7 +166,7 @@ def productos(request, response):
 
 
 @app.ruta("/agregarProducto")
-def agregarProducto(request,response):
+def agregarProductos(request,response):
 
     conexion= mysql.connector.connect(host='localhost',
                                   user='genaro',
@@ -200,7 +191,7 @@ def agregarProducto(request,response):
     conexion.close()
 
     response.text= app.template(
-        "agregarProducto.html", context={"title":"agregar Producto"})
+        "agregarProducto.html", context={"title":"PRODUCTO AGREGADO", "user": "!"})
 
     
 
