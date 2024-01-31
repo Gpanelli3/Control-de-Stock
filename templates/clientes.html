@@ -14,8 +14,6 @@
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="./clientes">CLIENTES</a>
-                    <li class="nav-item">
-                      <a class="nav-link" href="./altaclientes">Alta Clientes</a>
                       <li class="nav-item">
                         <a class="nav-link" href="./bajaclientes">Baja Clientes</a>
                       </li>
@@ -49,6 +47,21 @@
               </tr>
           {% endfor %}
         </table>
+    </div>
+
+    <div>
+      <h2 class='input'>Registro de Clientes </h2>
+      <form action="/altaclientes" method="post">
+          <label for="nombre">Nombre</label>
+          <input type="text" id="nombre" name="nombre" required><br><br>
+  
+          <label for="direccion">DNI:</label>
+          <input type="number" id="dni" name="dni"><br><br>
+  
+          <label for="telefono">Telefono</label>
+          <input type="number" id="telefono" name="telefono"><br><br>
+          <button type="submit" class="btn bg-warning-subtle">Confirmar</button>
+    </form>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>    
 </body>

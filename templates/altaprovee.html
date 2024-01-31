@@ -16,8 +16,6 @@
                     <a class="nav-link" href="./proveedores">PROVEEDORES</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="./altaprovee">ALTA PROVEEDORES</a>
-                  <li class="nav-item">
                     <a class="nav-link" href="./bajaprovee">BAJA PROVEEDORES</a>
                   <li class="nav-item">
                     <a class="nav-link" href="./clientes">CLIENTES</a>
@@ -34,19 +32,6 @@
 
     <body>
         <h1> {{ user }} </h1>
-
-      <h2>Registro de Proveedor</h2>
-      <form action="/altaprovee" method="post">
-          <label for="nombre">Nombre/Empresa</label>
-          <input type="text" id="nombre" name="nombre" required><br><br>
-
-          <label for="direccion">Direccion:</label>
-          <input type="text" id="direccion" name="direccion" required><br><br>
-
-          <label for="telefono">Telefono</label>
-          <input type="number" id="telefono" name="telefono" required><br><br>
-          <button type="submit" class="btn bg-warning-subtle">Confirmar</button>
-        </form>
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>    
   </body>
 </html>

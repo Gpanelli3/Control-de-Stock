@@ -87,7 +87,6 @@ def cliente(request,response):
     conexion.close()
 
 
-
     response.text = app.template(
     "clientes.html", context={"title": "Clientes", "user": "Lista de clientes","cliente": clientes})
 
@@ -160,8 +159,24 @@ def productos(request, response):
     cont=len(productos)
     print(cont)
 
+
+
+    conexion2= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor2=conexion2.cursor()
+    cursor2.execute("select * from categoria")
+
+    categorias=[]
+    for i in cursor2:
+        categorias.append(i)
+    print(categorias)
+    conexion2.close()
+        
+
     response.text = app.template(
-        "productos.html",context={"title": "Productos en stock","user": cont,"producto":productos})
+        "productos.html",context={"title": "Productos en stock","user": cont,"producto":productos, "categoria": categorias})
 
 
 
