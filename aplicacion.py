@@ -171,12 +171,24 @@ def productos(request, response):
     categorias=[]
     for i in cursor2:
         categorias.append(i)
-    print(categorias)
+    #print(categorias)
     conexion2.close()
-        
+
+
+    conexion3=mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor3=conexion3.cursor()
+    cursor3.execute("select id_proveedor,empresa from proveedores")
+
+    provee=[]
+    for i in cursor3:
+        provee.append(i)
+    conexion3.close()
 
     response.text = app.template(
-        "productos.html",context={"title": "Productos en stock","user": cont,"producto":productos, "categoria": categorias})
+        "productos.html",context={"title": "Productos en stock","user": cont,"producto":productos, "categoria": categorias, "proveedor": provee})
 
 
 
