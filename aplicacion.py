@@ -249,6 +249,29 @@ def borrarProducto(request,response):
 
     response.text=app.template(
         "borrarProducto.html",context={"title":"Borrar Producto"})
+    
+@app.ruta("/modificar")
+def modificar(request,response):
+    conexion=mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor=conexion.cursor()
+    
+
+    id=request.POST.get('id')
+    costo=request.POST.get('costo')
+    venta=request.POST.get('venta')
+
+    sql="update stock set precio_costo=%s where id_producto =%s"
+    datos=(id,costo)
+
+    cursor.execute(sql,datos)
+    conexion.commit()
+    conexion.close()
+
+    response.text=app.template(
+        "modificar.html",context={"title":"modificar Producto", "user": "modificar Producto"})
 
 @app.ruta("/facturas")
 def facturas(request,response):
@@ -258,12 +281,13 @@ def facturas(request,response):
                                   database='stock_control')
     cursor=conexion.cursor()
 
-    sql="SELECT factura.nro_factura, cliente.nombre, factura.fecha, factura.descripcion, factura.medio_de_pago, factura.total FROM factura inner join cliente on cliente.cliente_id = id_cliente;"
+    sql="SELECT factura.nro_factura, cliente.nombre, factura.fecha, factura.descripcion, factura.medio_de_pago, factura.total FROM factura inner join cliente on cliente.cliente_id = id_cliente"
     cursor.execute(sql)
     fact = []
     for i in cursor:
         fact.append(i)
+    #print(fact)
     conexion.close()
 
     response.text=app.template(
-        "facturas.html",context={"user": "Facturas", "facturas": fact})
+        "facturas.html",context={"user": "Facturas", "factura": fact})
