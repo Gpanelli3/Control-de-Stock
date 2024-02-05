@@ -1,3 +1,4 @@
+
 <html>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <header>
@@ -21,9 +22,6 @@
                   <li class="nav-item">
                     <a class="nav-link" href="./productos">PRODUCTOS</a>
                   </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="./facturas">FACTURAS</a>
-                  </li>
                 </ul>
               </div>
             </div>
@@ -31,13 +29,29 @@
     </header>
 
     <body>
-        Bienvenido  {{ user }} !!
+        Historial de {{ user }} !!
+        <div>
+            <table border="2" class="table">
+              <tr>
+                <td>Numero de factura</td>
+                <td>Nombre cliente</td>
+                <td>Fecha</td>
+                <td>Descripcion</td>
+                <td>Medio de pago</td>
+                <td>Total</td>
+              </tr>
+              
+              {% for i in factura %}
+                  <tr>
+                    {%for val in i%}
+                      <td>{{val}}</td>
+                    {% endfor %}
+                  </tr>
+              {% endfor %}
+            </table>
+        </div>
     </body>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>    
 
 </html>
                     
-              
-            
-        
-

@@ -249,3 +249,21 @@ def borrarProducto(request,response):
 
     response.text=app.template(
         "borrarProducto.html",context={"title":"Borrar Producto"})
+
+@app.ruta("/facturas")
+def facturas(request,response):
+    conexion=mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor=conexion.cursor()
+
+    sql="SELECT factura.nro_factura, cliente.nombre, factura.fecha, factura.descripcion, factura.medio_de_pago, factura.total FROM factura inner join cliente on cliente.cliente_id = id_cliente;"
+    cursor.execute(sql)
+    fact = []
+    for i in cursor:
+        fact.append(i)
+    conexion.close()
+
+    response.text=app.template(
+        "facturas.html",context={"user": "Facturas", "facturas": fact})
