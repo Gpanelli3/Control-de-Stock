@@ -261,17 +261,36 @@ def modificar(request,response):
 
     id=request.POST.get('id')
     costo=request.POST.get('costo')
-    venta=request.POST.get('venta')
 
     sql="update stock set precio_costo=%s where id_producto =%s"
-    datos=(id,costo)
+    datos=(costo,id)
 
     cursor.execute(sql,datos)
     conexion.commit()
     conexion.close()
 
+    #problemas con el precio venta
+    conexion2=mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor2=conexion.cursor()
+    
+    id2=request.POST.get('id')
+    venta=request.POST.get('venta')
+
+    sql2="update stock set precio_venta=%s where id_producto=%s"
+
+    data=(venta,id2)
+    cursor2.execute(sql2,data)
+    conexion.commit()
+    conexion.close()
+    
     response.text=app.template(
         "modificar.html",context={"title":"modificar Producto", "user": "modificar Producto"})
+
+
+
 
 @app.ruta("/facturas")
 def facturas(request,response):
