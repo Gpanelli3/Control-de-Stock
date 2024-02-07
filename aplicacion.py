@@ -310,6 +310,32 @@ def facturas(request,response):
     #print(fact)
     conexion.close()
 
+
+
+    
+
+
+    conexion_2=mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor_2=conexion_2.cursor()
+
+    factura_id=request.POST.get('factura')
+    id_cliente=request.POST.get('id')
+    fecha=request.POST.get('fecha')
+    descripcion=request.POST.get('descripcion')
+    pago=request.POST.get('pago')
+    descuento=request.POST.get('descuento')
+    total=request.POST.get('total')
+
+    sql="INSERT INTO factura (nro_factura,id_cliente,fecha,descripcion,medio_de_pago,descuento,total) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+    datos=(factura_id, id_cliente,fecha,descripcion,pago,descuento,total)
+
+    cursor_2.execute(sql,datos)
+    conexion_2.commit()
+    conexion_2.close()
+
     response.text=app.template(
         "facturas.html",context={"user": "Facturas", "factura": fact})
     
@@ -324,4 +350,4 @@ def ventas(request,response):
     cursor=conexion.cursor()
 
     response.text=app.template(
-        "ventas.html",context={"user": "Detalle de Facturas"})
+        "ventas.html",context={"user": "venta exitosamente cargada"})
