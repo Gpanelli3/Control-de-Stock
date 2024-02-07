@@ -171,7 +171,6 @@ def productos(request, response):
     categorias=[]
     for i in cursor2:
         categorias.append(i)
-    #print(categorias)
     conexion2.close()
 
 
@@ -310,44 +309,51 @@ def facturas(request,response):
     #print(fact)
     conexion.close()
 
+    response.text=app.template(
+        "facturas.html",context={"user": "Facturas", "factura": fact})
+        
 
 
     
 
+    
+    
 
+@app.ruta("/ventas")
+def ventas(request,response):
+
+
+    # Conectar a la base de datos por segunda vez
     conexion_2=mysql.connector.connect(host='localhost',
                                   user='genaro',
                                   passwd='password',
                                   database='stock_control')
     cursor_2=conexion_2.cursor()
 
+    # Obtener datos del formulario
     factura_id=request.POST.get('factura')
-    id_cliente=request.POST.get('id')
+    cliente=request.POST.get('idcli')
     fecha=request.POST.get('fecha')
     descripcion=request.POST.get('descripcion')
     pago=request.POST.get('pago')
     descuento=request.POST.get('descuento')
     total=request.POST.get('total')
 
-    sql="INSERT INTO factura (nro_factura,id_cliente,fecha,descripcion,medio_de_pago,descuento,total) VALUES (%s,%s,%s,%s,%s,%s,%s)"
-    datos=(factura_id, id_cliente,fecha,descripcion,pago,descuento,total)
+    if not descuento:
+        descuento=0
 
-    cursor_2.execute(sql,datos)
-    conexion_2.commit()
-    conexion_2.close()
+    sql_2="INSERT INTO factura (nro_factura,id_cliente,fecha,descripcion,medio_de_pago,descuento,total) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+    datos=(factura_id, cliente,fecha,descripcion,pago,descuento,total)
 
-    response.text=app.template(
-        "facturas.html",context={"user": "Facturas", "factura": fact})
-    
+    try:
+        cursor_2.execute(sql_2,datos)
+        conexion_2.commit()
+        print("insercion exitosa")
+    except mysql.connector.Error as error:
+        print("error al insertar en la base de datos", error)
+    finally:
+        conexion_2.close()
 
-@app.ruta("/ventas")
-def ventas(request,response):
-
-    conexion=mysql.connector.connect(host='localhost',
-                                  user='genaro',
-                                  passwd='password',
-                                  database='stock_control')
-    cursor=conexion.cursor()
 
     response.text=app.template(
         "ventas.html",context={"user": "venta exitosamente cargada"})
