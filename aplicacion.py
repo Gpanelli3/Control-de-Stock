@@ -323,7 +323,7 @@ def facturas(request,response):
 def ventas(request,response):
 
 
-    # Conectar a la base de datos por segunda vez
+    # Conectar a la base de datos
     conexion_2=mysql.connector.connect(host='localhost',
                                   user='genaro',
                                   passwd='password',
@@ -349,11 +349,28 @@ def ventas(request,response):
         cursor_2.execute(sql_2,datos)
         conexion_2.commit()
         print("insercion exitosa")
+
+        conexion_2.close()
+
+
+
+
     except mysql.connector.Error as error:
         print("error al insertar en la base de datos", error)
-    finally:
-        conexion_2.close()
+        
 
 
     response.text=app.template(
         "ventas.html",context={"user": "venta exitosamente cargada"})
+    
+
+
+    
+         # Conectar a la base de datos de detalle de factura
+        conexion_3=mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+        cursor_3=conexion_3.cursor()
+
+        sql="INSERT INTO detalle_factura(iddetalle_factura, factura_idfactura,id_productos, cantidad,total) VALUES (%s,%s,%s,%s,%s)"
