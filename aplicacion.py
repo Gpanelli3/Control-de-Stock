@@ -365,12 +365,15 @@ def ventas(request,response):
     
 
 
-    
-         # Conectar a la base de datos de detalle de factura
-        conexion_3=mysql.connector.connect(host='localhost',
+app.ruta("detalle")
+def detalle(request,response):
+      # Conectar a la base de datos de detalle de factura
+        conexion=mysql.connector.connect(host='localhost',
                                   user='genaro',
                                   passwd='password',
                                   database='stock_control')
-        cursor_3=conexion_3.cursor()
+        cursor=conexion.cursor()
 
         sql="INSERT INTO detalle_factura(iddetalle_factura, factura_idfactura,id_productos, cantidad,total) VALUES (%s,%s,%s,%s,%s)"
+
+        
