@@ -13,6 +13,7 @@ def home(request, response):
 
 @app.ruta("/proveedores")
 def otra(request, response):
+    #imprimir los proveedores
     conexion= mysql.connector.connect(host='localhost',
                                   user='genaro',
                                   passwd='password',
@@ -31,6 +32,7 @@ def otra(request, response):
 
 @app.ruta("/altaprovee")
 def altaprovee (request,response):
+    #dar de alta proveedores
     conexion= mysql.connector.connect(host='localhost',
                                   user='genaro',
                                   passwd='password',
@@ -42,10 +44,14 @@ def altaprovee (request,response):
     telefono=request.POST.get('telefono')
 
     sql="INSERT INTO proveedores (empresa,direccion,telefono) VALUES (%s,%s,%s)"
-    datos_proveedor=(nombre_proveedor,direccion,telefono)
 
-    cursor.execute(sql,datos_proveedor)
-    conexion.commit()
+    try:
+        datos_proveedor=(nombre_proveedor,direccion,telefono)
+
+        cursor.execute(sql,datos_proveedor)
+        conexion.commit()
+    except mysql.connector.Error as error:
+        print("error al actualizar en la base de datos", error)
     conexion.close()
 
     response.text=app.template(
@@ -54,7 +60,7 @@ def altaprovee (request,response):
 
 @app.ruta("/bajaprovee")
 def bajaprovee(request,response):
-
+    #borrar proveedores
     conexion= mysql.connector.connect(host='localhost',
                                     user='genaro',
                                     passwd='password',
@@ -65,9 +71,12 @@ def bajaprovee(request,response):
     dato_client=(id,)
 
     sql="delete from proveedores where id_proveedor = %s"
-    datos=(dato_client)
-    cursor4.execute(sql,datos)
-    conexion.commit()
+    try:
+        datos=(dato_client)
+        cursor4.execute(sql,datos)
+        conexion.commit()
+    except mysql.connector.Error as error:
+        print("error al actualizar en la base de datos", error)
     conexion.close()
     
     response.text = app.template(
@@ -75,6 +84,7 @@ def bajaprovee(request,response):
 
 @app.ruta("/clientes")
 def cliente(request,response):
+    #imprimir todos los clientes
     conexion= mysql.connector.connect(host='localhost',
                                   user='genaro',
                                   passwd='password',
@@ -95,7 +105,7 @@ def cliente(request,response):
 
 @app.ruta("/altaclientes")
 def altaclientes(request, response):
-
+    #alta clientes mediante un insert
     conexion= mysql.connector.connect(host='localhost',
                                     user='genaro',
                                     passwd='password',
@@ -107,10 +117,12 @@ def altaclientes(request, response):
     telefono_cliente=request.POST.get('telefono')
 
     sql="INSERT INTO cliente (nombre,dni,telefono) VALUES (%s,%s,%s)"
-
-    datos_cliente=(nombre_cliente,dni_cliente,telefono_cliente)
-    cursor3.execute(sql,datos_cliente)
-    conexion.commit()
+    try:
+        datos_cliente=(nombre_cliente,dni_cliente,telefono_cliente)
+        cursor3.execute(sql,datos_cliente)
+        conexion.commit()
+    except mysql.connector.Error as error:
+        print("error al actualizar en la base de datos", error)
     conexion.close()
     
     response.text=app.template(
@@ -131,9 +143,13 @@ def bajacliente(request,response):
     dato_client=(id,)
 
     sql="delete from cliente where cliente_id = %s"
-    datos=(dato_client)
-    cursor4.execute(sql,datos)
-    conexion.commit()
+
+    try:
+        datos=(dato_client)
+        cursor4.execute(sql,datos)
+        conexion.commit()
+    except mysql.connector.Error as error:
+        print("error al actualizar en la base de datos", error)
     conexion.close()
     
     response.text = app.template(
@@ -145,6 +161,7 @@ def bajacliente(request,response):
 
 @app.ruta("/productos")
 def productos(request, response):
+    #conexion para imprimir los productos
     conexion= mysql.connector.connect(host='localhost',
                                   user='genaro',
                                   passwd='password',
@@ -160,7 +177,7 @@ def productos(request, response):
     print(cont)
 
 
-
+    #conexion para traer las categorias de productos
     conexion2= mysql.connector.connect(host='localhost',
                                   user='genaro',
                                   passwd='password',
@@ -173,7 +190,7 @@ def productos(request, response):
         categorias.append(i)
     conexion2.close()
 
-
+    #conexion para traer los proveedores 
     conexion3=mysql.connector.connect(host='localhost',
                                   user='genaro',
                                   passwd='password',
@@ -210,10 +227,14 @@ def agregarProductos(request,response):
     precio_venta=request.POST.get('venta')
 
     sql="INSERT INTO stock (id_producto, nombre,id_proveedor,categoria,cantidad,precio_costo,precio_venta) VALUES(%s,%s,%s,%s,%s,%s,%s)"
-    datos_producto=(id,nombre,proveedor,cat,cantidad,costo,precio_venta)
+    try: 
+        datos_producto=(id,nombre,proveedor,cat,cantidad,costo,precio_venta)
+        cursor.execute(sql,datos_producto)
+        conexion.commit()
     
-    cursor.execute(sql,datos_producto)
-    conexion.commit()
+
+    except mysql.connector.Error as error:
+        print("error al actualizar en la base de datos", error)
     conexion.close()
 
     response.text= app.template(
@@ -276,17 +297,49 @@ def modificar(request,response):
     id=request.POST.get('id')
     costo=request.POST.get('costo')
 
-    
-
     sql="update stock set precio_costo=%s where id_producto =%s"
-    datos=(costo,id)
+    
+    try:
+        datos=(costo,id)
 
-    cursor2.execute(sql,datos)
-    conexion2.commit()
-    conexion2.close()
+        cursor2.execute(sql,datos)
+        conexion2.commit()
+        print("actualizacion correcta")
+
+    except mysql.connector.Error as error:
+        print("error al actualizar en la base de datos", error)
+
+        conexion2.close()
+#----------------------------------------------------------------
+        
+    #conexion base de datos para cambiar el precio venta
+    conexion3=mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor3=conexion3.cursor()
+
+
+    #traigo los datos del formulario de precio venta
+    id3=request.POST.get('idven')
+    venta=request.POST.get('venta')
+
+    sql3="update stock set precio_venta=%s where id_producto=%s"
+    try: 
+
+        data=(venta,id3)
+        cursor3.execute(sql3,data)
+        conexion3.commit()
+
+    except mysql.connector.Error as error:
+        print("error al actualizar en la base de datos", error)
+    conexion3.close()
     
     response.text=app.template(
         "modificar.html",context={"title":"modificar Producto","producto":productos})
+
+
+
 
 
 
@@ -298,24 +351,22 @@ def facturas(request,response):
                                   passwd='password',
                                   database='stock_control')
     cursor=conexion.cursor()
-
+    	
     sql="SELECT factura.nro_factura, cliente.nombre, factura.fecha, factura.descripcion, factura.medio_de_pago, factura.total FROM factura inner join cliente on cliente.cliente_id = id_cliente"
-    cursor.execute(sql)
-    fact = []
-    for i in cursor:
-        fact.append(i)
-    #print(fact)
+    try:
+        cursor.execute(sql)
+        fact = []
+        for i in cursor:
+            fact.append(i)
+
+    except mysql.connector.Error as error:
+        print("error al actualizar en la base de datos", error)
     conexion.close()
 
     response.text=app.template(
         "facturas.html",context={"user": "Facturas", "factura": fact})
         
 
-
-    
-
-    
-    
 
 @app.ruta("/ventas")
 def ventas(request,response):
@@ -348,22 +399,16 @@ def ventas(request,response):
         conexion_2.commit()
         print("insercion exitosa")
 
-        conexion_2.close()
-
-
-
 
     except mysql.connector.Error as error:
         print("error al insertar en la base de datos", error)
-        
 
-
+    conexion_2.close()
     response.text=app.template(
         "ventas.html",context={"user": "venta exitosamente cargada"})
     
 
-
-app.ruta("detalle")
+@app.ruta("detalle")
 def detalle(request,response):
       # Conectar a la base de datos de detalle de factura
         conexion=mysql.connector.connect(host='localhost',
@@ -373,5 +418,16 @@ def detalle(request,response):
         cursor=conexion.cursor()
 
         sql="INSERT INTO detalle_factura(iddetalle_factura, factura_idfactura,id_productos, cantidad,total) VALUES (%s,%s,%s,%s,%s)"
+
+    
+    
+
+
+
+        
+
+
+    
+
 
         
