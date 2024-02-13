@@ -251,11 +251,26 @@ def borrarProducto(request,response):
     
 @app.ruta("/modificar")
 def modificar(request,response):
-    conexion=mysql.connector.connect(host='localhost',
+
+    #conexion base de datos para traer todos los productos
+    conexion= mysql.connector.connect(host='localhost',
                                   user='genaro',
                                   passwd='password',
                                   database='stock_control')
     cursor=conexion.cursor()
+    productos=[]
+    cursor.execute("select id_producto,nombre,cantidad,precio_costo,precio_venta from stock")
+
+    for i in cursor:
+        productos.append(i)
+    conexion.close()
+    
+    #conexion base de datos para update de costo
+    conexion2=mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor2=conexion2.cursor()
     
 
     id=request.POST.get('id')
@@ -266,29 +281,12 @@ def modificar(request,response):
     sql="update stock set precio_costo=%s where id_producto =%s"
     datos=(costo,id)
 
-    cursor.execute(sql,datos)
-    conexion.commit()
-    conexion.close()
-
-    #problemas con el precio venta
-    conexion2=mysql.connector.connect(host='localhost',
-                                  user='genaro',
-                                  passwd='password',
-                                  database='stock_control')
-    cursor2=conexion.cursor()
-    
-    id2=request.POST.get('id')
-    venta=request.POST.get('venta')
-
-    sql2="update stock set precio_venta=%s where id_producto=%s"
-
-    data=(venta,id2)
-    cursor2.execute(sql2,data)
-    conexion.commit()
-    conexion.close()
+    cursor2.execute(sql,datos)
+    conexion2.commit()
+    conexion2.close()
     
     response.text=app.template(
-        "modificar.html",context={"title":"modificar Producto", "user": "modificar Producto"})
+        "modificar.html",context={"title":"modificar Producto","producto":productos})
 
 
 
