@@ -355,9 +355,13 @@ def facturas(request,response):
     sql="SELECT factura.nro_factura, cliente.nombre, factura.fecha, factura.descripcion, factura.medio_de_pago, factura.total FROM factura inner join cliente on cliente.cliente_id = id_cliente"
     try:
         cursor.execute(sql)
-        fact = []
+        facturas = []
         for i in cursor:
-            fact.append(i)
+            facturas.append(i)
+
+        fact=[]
+        for i in range(len(facturas)):
+            fact.append(facturas[-i-1])
 
     except mysql.connector.Error as error:
         print("error al actualizar en la base de datos", error)
@@ -408,7 +412,7 @@ def ventas(request,response):
         "ventas.html",context={"user": "venta exitosamente cargada"})
     
 
-@app.ruta("detalle")
+@app.ruta("/detalle")
 def detalle(request,response):
       # Conectar a la base de datos de detalle de factura
         conexion=mysql.connector.connect(host='localhost',
@@ -418,19 +422,27 @@ def detalle(request,response):
         cursor=conexion.cursor()
         #sql="INSERT INTO detalle_factura(iddetalle_factura, factura_idfactura,id_productos, cantidad,total) VALUES (%s,%s,%s,%s,%s)"
         
-        #traemos la ultima venta
-        sql="select * from factura"
-        cursor.execute(sql)
-
-        facturas = []
-        for i in cursor:
-            facturas.append(i)
+        #traemos las ultimas 3 ventas
+        cursor.execute("select * from factura")
+        try:
+            facturas = []
+            for i in cursor:
+                facturas.append(i)
+            
+            fact=[]
+            for i in range(len(facturas)):
+                fact.append(facturas[-i-1])
+                if len(fact) == 3:
+                    break
+        except mysql.connector.Error as error:
+            print("error al insertar en la base de datos", error)
         conexion.close()
 
+        
 
         response.text=app.template(
-            "detalle.html",context={"user": "detalle factura", "factura": facturas }
-        )
+            "detalle.html",context={"user": "detalle factura", "factura": fact })
+
 
     
     
