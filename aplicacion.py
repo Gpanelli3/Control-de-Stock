@@ -416,8 +416,21 @@ def detalle(request,response):
                                   passwd='password',
                                   database='stock_control')
         cursor=conexion.cursor()
+        #sql="INSERT INTO detalle_factura(iddetalle_factura, factura_idfactura,id_productos, cantidad,total) VALUES (%s,%s,%s,%s,%s)"
+        
+        #traemos la ultima venta
+        sql="select * from factura"
+        cursor.execute(sql)
 
-        sql="INSERT INTO detalle_factura(iddetalle_factura, factura_idfactura,id_productos, cantidad,total) VALUES (%s,%s,%s,%s,%s)"
+        facturas = []
+        for i in cursor:
+            facturas.append(i)
+        conexion.close()
+
+
+        response.text=app.template(
+            "detalle.html",context={"user": "detalle factura", "factura": facturas }
+        )
 
     
     
