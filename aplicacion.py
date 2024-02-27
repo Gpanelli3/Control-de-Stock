@@ -352,7 +352,7 @@ def facturas(request,response):
                                   database='stock_control')
     cursor=conexion.cursor()
     	
-    sql="SELECT factura.nro_factura, cliente.nombre, factura.fecha, factura.descripcion, factura.medio_de_pago, factura.total FROM factura inner join cliente on cliente.cliente_id = id_cliente"
+    sql="SELECT factura.nro_factura, cliente.nombre, factura.fecha, factura.descripcion, factura.medio_de_pago, factura.total FROM factura inner join cliente on cliente.cliente_id = id_cliente order by nro_factura"
     try:
         cursor.execute(sql)
         facturas = []
@@ -446,7 +446,39 @@ def detalle(request,response):
 
     
     
+@app.ruta("/detfactura")
+def ventas(request,response):
 
+
+    # Conectar a la base de datos
+    conexion=mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor=conexion.cursor()
+
+    # Obtener datos del formulario
+    detalle=request.POST.get('detalle')
+    factura=request.POST.get('factura')
+    producto=request.POST.get('producto')
+    cantidad=request.POST.get('cantidad')
+    total=request.POST.get('total')
+
+
+    sql="insert into detalle_factura (iddetalle_factura,factura_idfactura,id_productos,cantidad,total) VALUES (%s,%s,%s,%s,%s)"
+    datos=(detalle,factura,producto,cantidad,total)
+    try:
+        cursor.execute(sql,datos)
+        conexion.commit()
+        print("insercion exitosa")
+        conexion.close()
+
+
+    except mysql.connector.Error as error:
+        print("error al insertar en la base de datos", error)
+
+    response.text=app.template(
+        "detfactura.html",context={"user": "venta exitosamente cargada"})
 
 
         
