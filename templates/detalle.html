@@ -74,7 +74,29 @@
           </div>
         </form>
       </div>
-                
+
+
+      <div>
+        <table border="2" class="table">
+          <tr>
+            <td>ID DETALLE FACTURA</td>
+            <td>ID FACTURA</td>
+            <td>ID PRODUCTO</td>
+            <td>CANTIDAD</td>
+            <td>TOTAL</td>
+          </tr>
+          
+          {% for i in detalle %}
+              <tr>
+                {%for val in i%}
+                  <td>{{val}}</td>
+                {% endfor %}
+              </tr>
+          {% endfor %}
+        </table>
+    </div>
+
+
 
        <div>
         <table border="2" class="table">

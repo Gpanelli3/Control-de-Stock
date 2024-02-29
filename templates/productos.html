@@ -50,12 +50,13 @@
           <td>CANTIDAD</td>
           <td>PRECIO COSTO</td>
           <td>PRECIO VENTA</td>
+          <td>VENDER</td>
         </tr>
         
         {% for i in producto %}
             <tr>
               {%for val in i%}
-                <td>{{val}}</td>
+                <td>{{val}}</td>  
               {% endfor %}
             </tr>
         {% endfor %}

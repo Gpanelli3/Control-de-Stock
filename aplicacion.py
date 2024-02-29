@@ -174,7 +174,6 @@ def productos(request, response):
         productos.append(i)
     conexion.close()
     cont=len(productos)
-    print(cont)
 
 
     #conexion para traer las categorias de productos
@@ -414,15 +413,14 @@ def ventas(request,response):
 
 @app.ruta("/detalle")
 def detalle(request,response):
-      # Conectar a la base de datos de detalle de factura
+      # Conectar a la base de datos de FACTURA
         conexion=mysql.connector.connect(host='localhost',
                                   user='genaro',
                                   passwd='password',
                                   database='stock_control')
         cursor=conexion.cursor()
-        #sql="INSERT INTO detalle_factura(iddetalle_factura, factura_idfactura,id_productos, cantidad,total) VALUES (%s,%s,%s,%s,%s)"
-        
-        #traemos las ultimas 3 ventas
+
+        #traemos las ultimas 5 ventas
         cursor.execute("select * from factura")
         try:
             facturas = []
@@ -432,16 +430,37 @@ def detalle(request,response):
             fact=[]
             for i in range(len(facturas)):
                 fact.append(facturas[-i-1])
-                if len(fact) == 3:
+                if len(fact) == 5:
                     break
         except mysql.connector.Error as error:
             print("error al insertar en la base de datos", error)
         conexion.close()
 
+
+        # Conectar a la base de datos de DETALLE DE FACTURA
+        conexion_2=mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+        cursor_2=conexion_2.cursor()
+
+        sql="select detalle_factura.iddetalle_factura, detalle_factura.factura_idfactura, stock.nombre, detalle_factura.cantidad, detalle_factura.total from detalle_factura  inner join stock on stock.id_producto = id_productos"
+        
+        cursor_2.execute(sql)
+        detalles=[]
+        for i in cursor_2:
+            detalles.append(i)
+
+        det=[]
+        for i in range(len(detalles)):
+            det.append(detalles[-i-1])
+            if len(det) == 5:
+                break
+        conexion_2.close()
         
 
         response.text=app.template(
-            "detalle.html",context={"user": "detalle factura", "factura": fact })
+            "detalle.html",context={"user": "detalle factura","detalle":det, "factura": fact })
 
 
     
@@ -464,7 +483,7 @@ def ventas(request,response):
     cantidad=request.POST.get('cantidad')
     total=request.POST.get('total')
 
-
+    #inserto los datos a detalle de factura
     sql="insert into detalle_factura (iddetalle_factura,factura_idfactura,id_productos,cantidad,total) VALUES (%s,%s,%s,%s,%s)"
     datos=(detalle,factura,producto,cantidad,total)
     try:
