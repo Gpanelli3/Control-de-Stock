@@ -41,7 +41,6 @@
 <body>
     <h1> {{ user }} </h1>
 
-
     <div>
       <table border="2" class="table">
         <tr>
@@ -56,12 +55,16 @@
         {% for i in producto %}
             <tr>
               {%for val in i%}
-                <td>{{val}}</td>  
+                <td>{{val}}</td>
               {% endfor %}
-            </tr>
-        {% endfor %}
+              <form action="/carrito" method="post">
+                <td><button id="venta" name="venta">Vender</button></td>   
+              </form>
+              </tr>
+              {% endfor %}
       </table>
     </div>
+
 
     <div class="container text-center">
       <div class="row">

@@ -153,7 +153,7 @@ def bajacliente(request,response):
     conexion.close()
     
     response.text = app.template(
-    "bajaclientes.html", context={"title": "Baja clientes", "user": "Genaro"})
+    "bajaclientes.html", context={"title": "Baja clientes", "user": "CLIENTE ELIMINADO CORRECTAMENTE"})
 
 
     
@@ -506,4 +506,28 @@ def ventas(request,response):
     
 
 
-        
+@app.ruta("/carrito")
+def carrito(request,response):
+
+    #conexion para imprimir los productos
+    conexion= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor3=conexion.cursor()
+    productos=[]
+    cursor3.execute("select id_producto,nombre,precio_venta from stock")
+
+    for i in cursor3:
+        productos.append(i)
+        print(productos)
+    conexion.close()
+
+
+    id=request.POST.get('venta')
+    productos=[]
+    
+
+    response.text=app.template(
+        "carrito.html",context={"user": "CARRITO"})
+    
