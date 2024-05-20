@@ -296,43 +296,26 @@ def modificar(request,response):
     id=request.POST.get('id')
     costo=request.POST.get('costo')
 
-    sql="update stock set precio_costo=%s where id_producto =%s"
+    costInt=int(costo)
+    venta=costInt + 3000
+
+
+    sql="update stock set precio_costo=%s, precio_venta=%s where id_producto =%s"
     
     try:
-        datos=(costo,id)
+        datos=(costo,venta, id)
 
         cursor2.execute(sql,datos)
         conexion2.commit()
+        
         print("actualizacion correcta")
+        #print(venta)
 
     except mysql.connector.Error as error:
         print("error al actualizar en la base de datos", error)
 
         conexion2.close()
-#----------------------------------------------------------------
-        
-    #conexion base de datos para cambiar el precio venta
-    conexion3=mysql.connector.connect(host='localhost',
-                                  user='genaro',
-                                  passwd='password',
-                                  database='stock_control')
-    cursor3=conexion3.cursor()
 
-
-    #traigo los datos del formulario de precio venta
-    id3=request.POST.get('idven')
-    venta=request.POST.get('venta')
-
-    sql3="update stock set precio_venta=%s where id_producto=%s"
-    try: 
-
-        data=(venta,id3)
-        cursor3.execute(sql3,data)
-        conexion3.commit()
-
-    except mysql.connector.Error as error:
-        print("error al actualizar en la base de datos", error)
-    conexion3.close()
     
     response.text=app.template(
         "modificar.html",context={"title":"modificar Producto","producto":productos})
@@ -383,7 +366,7 @@ def ventas(request,response):
     cursor_2=conexion_2.cursor()
 
     # Obtener datos del formulario
-    factura_id=request.POST.get('factura')
+    #factura_id=request.POST.get('factura')
     cliente=request.POST.get('idcli')
     fecha=request.POST.get('fecha')
     descripcion=request.POST.get('descripcion')
@@ -394,8 +377,8 @@ def ventas(request,response):
     if not descuento:
         descuento=0
 
-    sql_2="INSERT INTO factura (nro_factura,id_cliente,fecha,descripcion,medio_de_pago,descuento,total) VALUES (%s,%s,%s,%s,%s,%s,%s)"
-    datos=(factura_id, cliente,fecha,descripcion,pago,descuento,total)
+    sql_2="INSERT INTO factura (id_cliente,fecha,descripcion,medio_de_pago,descuento,total) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+    datos=( cliente,fecha,descripcion,pago,descuento,total)
 
     try:
         cursor_2.execute(sql_2,datos)
@@ -477,15 +460,15 @@ def ventas(request,response):
     cursor=conexion.cursor()
 
     # Obtener datos del formulario
-    detalle=request.POST.get('detalle')
+    #detalle=request.POST.get('detalle')
     factura=request.POST.get('factura')
     producto=request.POST.get('producto')
     cantidad=request.POST.get('cantidad')
     total=request.POST.get('total')
 
     #inserto los datos a detalle de factura
-    sql="insert into detalle_factura (iddetalle_factura,factura_idfactura,id_productos,cantidad,total) VALUES (%s,%s,%s,%s,%s)"
-    datos=(detalle,factura,producto,cantidad,total)
+    sql="insert into detalle_factura (factura_idfactura,id_productos,cantidad,total) VALUES (%s,%s,%s,%s,%s)"
+    datos=(factura,producto,cantidad,total)
     try:
         cursor.execute(sql,datos)
         conexion.commit()
@@ -531,3 +514,4 @@ def carrito(request,response):
     response.text=app.template(
         "carrito.html",context={"user": "CARRITO"})
     
+
