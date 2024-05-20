@@ -5,6 +5,7 @@ from apiwsgi import Wsgiclass
 
 app = Wsgiclass()
 
+
 @app.ruta("/home")
 def home(request, response):
     response.text = app.template(
@@ -349,6 +350,10 @@ def facturas(request,response):
         print("error al actualizar en la base de datos", error)
     conexion.close()
 
+
+    
+
+
     response.text=app.template(
         "facturas.html",context={"user": "Facturas", "factura": fact})
         
@@ -393,6 +398,47 @@ def ventas(request,response):
     response.text=app.template(
         "ventas.html",context={"user": "venta exitosamente cargada"})
     
+
+
+
+@app.ruta("/bajaFactura")
+def bajaFactura(request,response):
+    #--conexion para borrar facturas
+    conexion= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor=conexion.cursor()
+
+    fact=request.POST.get('id')
+
+    sql ="DELETE FROM detalle_factura WHERE factura_idfactura = %s;"
+
+    datId=(fact,)
+    cursor.execute(sql,datId)
+    conexion.commit()
+    conexion.close()
+
+    ##############__----------------------------
+    conexionDos= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursorDos=conexionDos.cursor()
+
+    fact=request.POST.get('id')
+
+    sqlDos="delete from factura where nro_factura = %s"
+    data=(fact,)
+
+    cursorDos.execute(sqlDos,data)
+    
+    conexionDos.commit()
+    conexionDos.close()
+
+    response.text=app.template(
+        "bajaFacturas.html")
+
 
 @app.ruta("/detalle")
 def detalle(request,response):
