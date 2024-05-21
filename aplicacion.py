@@ -3,7 +3,33 @@ from jinja2 import environment
 from apiwsgi import Wsgiclass
 
 
+
 app = Wsgiclass()
+
+
+@app.ruta("/")
+def productos(request, response):
+    #conexion para imprimir los productos
+    conexion= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor=conexion.cursor()
+    
+    productos=[]
+    cursor.execute("select id_producto,nombre,cantidad,precio_costo,precio_venta from stock order by id_producto DESC")
+
+    for i in cursor:
+        productos.append(i)
+    conexion.close()
+    cont=len(productos)
+
+    response.text = app.template(
+        "productos.html",context={"title": "Productos en stock","user": cont,"producto":productos})
+
+    
+
+
 
 
 @app.ruta("/proveedores")
@@ -101,27 +127,6 @@ def altaclientes(request, response):
     
 
 
-@app.ruta("/")
-def productos(request, response):
-    #conexion para imprimir los productos
-    conexion= mysql.connector.connect(host='localhost',
-                                  user='genaro',
-                                  passwd='password',
-                                  database='stock_control')
-    cursor3=conexion.cursor()
-    productos=[]
-    cursor3.execute("select id_producto,nombre,cantidad,precio_costo,precio_venta from stock order by id_producto DESC")
-
-    for i in cursor3:
-        productos.append(i)
-    conexion.close()
-    cont=len(productos)
-
-
-    
-    response.text = app.template(
-        "productos.html",context={"title": "Productos en stock","user": cont,"producto":productos})
-
 @app.ruta("/insertar")
 def insertar(request,response):
     #conexion para hacer el insert
@@ -197,6 +202,45 @@ def agregarProducto(request,response):
     
 @app.ruta("/borrarProducto")
 def borrarProducto(request,response):
+    #conexion para imprimir los productos
+    conexion_2= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor_2=conexion_2.cursor()
+    
+    productos=[]
+    cursor_2.execute("select id_producto,nombre,cantidad,precio_costo,precio_venta from stock order by id_producto DESC")
+
+    for i in cursor_2:
+        productos.append(i)
+    conexion_2.close()
+
+    response.text=app.template(
+        "borrarProducto.html",context={"title":"Borrar Producto", "producto":productos})
+    
+
+    
+
+@app.ruta("/delete")
+def delete(request,response):
+    conexion_2= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor_2=conexion_2.cursor()
+
+    id=request.POST.get('id')
+    datId=(id,)
+
+    sql ="DELETE FROM detalle_factura WHERE id_productos = %s;"
+    datos=(datId)
+
+    cursor_2.execute(sql,datos)
+    conexion_2.commit()
+    conexion_2.close()
+
+    ##################DELETE
     conexion= mysql.connector.connect(host='localhost',
                                   user='genaro',
                                   passwd='password',
@@ -205,7 +249,6 @@ def borrarProducto(request,response):
 
     
     id=request.POST.get('id')
-    #nombre=request.POST.get('nombre')
 
     datId=(id,)
 
@@ -216,9 +259,7 @@ def borrarProducto(request,response):
     conexion.commit()
     conexion.close()
 
-    response.text=app.template(
-        "borrarProducto.html",context={"title":"Borrar Producto"})
-    
+    response.text=app.template("update.html")
 
 
 @app.ruta("/modificar")
@@ -247,6 +288,7 @@ def modificar(request,response):
 
 @app.ruta("/updateProductos")
 def updateProductos(request,response):
+
     #conexion base de datos para update de costo
     conexion2=mysql.connector.connect(host='localhost',
                                   user='genaro',
@@ -310,53 +352,6 @@ def facturas(request,response):
         "facturas.html",context={"user": "Facturas", "factura": fact})
 
 
-    
-
-
-        
-
-
-@app.ruta("/ventas")
-def ventas(request,response):
-
-
-    # Conectar a la base de datos
-    conexion_2=mysql.connector.connect(host='localhost',
-                                  user='genaro',
-                                  passwd='password',
-                                  database='stock_control')
-    cursor_2=conexion_2.cursor()
-
-    # Obtener datos del formulario
-    #factura_id=request.POST.get('factura')
-    cliente=request.POST.get('idcli')
-    fecha=request.POST.get('fecha')
-    descripcion=request.POST.get('descripcion')
-    pago=request.POST.get('pago')
-    descuento=request.POST.get('descuento')
-    total=request.POST.get('total')
-
-    if not descuento:
-        descuento=0
-
-    sql_2="INSERT INTO factura (id_cliente,fecha,descripcion,medio_de_pago,descuento,total) VALUES (%s,%s,%s,%s,%s,%s,%s)"
-    datos=( cliente,fecha,descripcion,pago,descuento,total)
-
-    try:
-        cursor_2.execute(sql_2,datos)
-        conexion_2.commit()
-        print("insercion exitosa")
-
-
-    except mysql.connector.Error as error:
-        print("error al insertar en la base de datos", error)
-
-    conexion_2.close()
-    response.text=app.template(
-        "ventas.html",context={"user": "venta exitosamente cargada"})
-    
-
-
 
 @app.ruta("/bajaFactura")
 def bajaFactura(request,response):
@@ -393,8 +388,76 @@ def bajaFactura(request,response):
     conexionDos.commit()
     conexionDos.close()
 
+
+    ######################################
+
+    conexionTres= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursorTres=conexionTres.cursor()
+    
+    sql="SELECT factura.nro_factura, cliente.nombre, factura.fecha, factura.descripcion, factura.medio_de_pago, factura.total FROM factura inner join cliente on cliente.cliente_id = id_cliente order by nro_factura"
+    
+    cursorTres.execute(sql)
+    facturas = []
+    for i in cursorTres:
+        facturas.append(i)
+
+    fact=[]
+    for i in range(len(facturas)):
+        fact.append(facturas[-i-1])
+
+
     response.text=app.template(
-        "bajaFacturas.html")
+        "bajaFacturas.html", context={"factura": fact})    
+
+
+        
+
+
+@app.ruta("/ventas")
+def ventas(request,response):
+
+
+    # Conectar a la base de datos
+    conexion_2=mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor_2=conexion_2.cursor()
+
+    # Obtener datos del formulario
+
+    cliente=request.POST.get('idcli')
+    fecha=request.POST.get('fecha')
+    descripcion=request.POST.get('descripcion')
+    pago=request.POST.get('pago')
+    descuento=request.POST.get('descuento')
+    total=request.POST.get('total')
+
+    if not descuento:
+        descuento=0
+
+    sql_2="INSERT INTO factura (id_cliente,fecha,descripcion,medio_de_pago,descuento,total) VALUES (%s,%s,%s,%s,%s,%s)"
+    datos=( cliente,fecha,descripcion,pago,descuento,total)
+
+    try:
+        cursor_2.execute(sql_2,datos)
+        conexion_2.commit()
+        print("insercion exitosa")
+
+
+    except mysql.connector.Error as error:
+        print("error al insertar en la base de datos", error)
+
+    conexion_2.close()
+    response.text=app.template(
+        "ventas.html",context={"user": "venta exitosamente cargada"})
+    
+
+
+
 
 
 @app.ruta("/detalle")
