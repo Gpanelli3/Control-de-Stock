@@ -5,9 +5,28 @@ from apiwsgi import Wsgiclass
 
 
 app = Wsgiclass()
-
-
 @app.ruta("/")
+def productos(request, response):
+    #conexion para imprimir los productos
+    conexion= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor=conexion.cursor()
+    
+    productos=[]
+    cursor.execute("select id_producto,nombre,cantidad,precio_costo,precio_venta from stock order by id_producto DESC")
+
+    for i in cursor:
+        productos.append(i)
+    conexion.close()
+    cont=len(productos)
+
+    response.text = app.template(
+        "inicio.html",context={"title": "Productos en stock","user": cont,"producto":productos})
+
+
+@app.ruta("/homeAdmin")
 def productos(request, response):
     #conexion para imprimir los productos
     conexion= mysql.connector.connect(host='localhost',
@@ -129,32 +148,6 @@ def altaclientes(request, response):
 
 @app.ruta("/insertar")
 def insertar(request,response):
-    #conexion para hacer el insert
-    conexion= mysql.connector.connect(host='localhost',
-                                  user='genaro',
-                                  passwd='password',
-                                  database='stock_control')
-    cursor=conexion.cursor()
-
-    nombre=request.POST.get('nombre')
-    proveedor=request.POST.get('proveedor')
-    cat=request.POST.get('categoria')
-    cantidad=request.POST.get('cantidad')
-    costo=request.POST.get('costo')
-
-
-    sql="INSERT INTO stock (nombre,id_proveedor,categoria,cantidad,precio_costo,precio_venta) VALUES(%s,%s,%s,%s,%s,%s)"
-    
-    #nombreLow=nombre.lower()
-
-    #precioInt=int(costo)
-    #venta=precioInt + 3000
-
-    datos_producto=(nombre,proveedor,cat,cantidad,costo,costo)
-    cursor.execute(sql,datos_producto)
-    conexion.commit()
-    conexion.close()
-
     #conexion para traer los proveedores 
     conexion3=mysql.connector.connect(host='localhost',
                                   user='genaro',
@@ -171,8 +164,43 @@ def insertar(request,response):
     response.text = app.template("agregarProducto.html", context={"proveedor":provee})
     
 
+@app.ruta("/agregar")
+def agregar (request,response):
+
+    conexion= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor=conexion.cursor()
+
+    nombre=request.POST.get('nombre')
+    proveedor=request.POST.get('proveedor')
+    cat=request.POST.get('categoria')
+    cantidad=request.POST.get('cantidad')
+    costo=request.POST.get('costo')
+
+    nombreLow=nombre.lower()
+    precioInt=int(costo)
+    venta=precioInt + 3000
+
+    sql="INSERT INTO stock (nombre,id_proveedor,categoria,cantidad,precio_costo,precio_venta) VALUES(%s,%s,%s,%s,%s,%s)"
+    
 
 
+    datos_producto=(nombreLow,proveedor,cat,cantidad,costo,venta)
+    cursor.execute(sql,datos_producto)
+    prod=cursor.fetchone()
+
+    conexion.commit()
+    conexion.close()
+
+    if prod:
+
+        response.status_code = 302
+        response.headers['Location'] = '/homeAdmin'
+
+    response.text=app.template(
+        "update.html")
     
 @app.ruta("/borrarProductos")
 def borrarProductos(request,response):
@@ -422,126 +450,9 @@ def ventas(request,response):
     conexion_2.close()
     response.text=app.template(
         "ventas.html",context={"user": "venta exitosamente cargada"})
-    
 
 
 
-
-
-@app.ruta("/detalle")
-def detalle(request,response):
-      # Conectar a la base de datos de FACTURA
-        conexion=mysql.connector.connect(host='localhost',
-                                  user='genaro',
-                                  passwd='password',
-                                  database='stock_control')
-        cursor=conexion.cursor()
-
-        #traemos las ultimas 5 ventas
-        cursor.execute("select * from factura")
-        try:
-            facturas = []
-            for i in cursor:
-                facturas.append(i)
-            
-            fact=[]
-            for i in range(len(facturas)):
-                fact.append(facturas[-i-1])
-                if len(fact) == 5:
-                    break
-        except mysql.connector.Error as error:
-            print("error al insertar en la base de datos", error)
-        conexion.close()
-
-
-        # Conectar a la base de datos de DETALLE DE FACTURA
-        conexion_2=mysql.connector.connect(host='localhost',
-                                  user='genaro',
-                                  passwd='password',
-                                  database='stock_control')
-        cursor_2=conexion_2.cursor()
-
-        sql="select detalle_factura.iddetalle_factura, detalle_factura.factura_idfactura, stock.nombre, detalle_factura.cantidad, detalle_factura.total from detalle_factura  inner join stock on stock.id_producto = id_productos"
-        
-        cursor_2.execute(sql)
-        detalles=[]
-        for i in cursor_2:
-            detalles.append(i)
-
-        det=[]
-        for i in range(len(detalles)):
-            det.append(detalles[-i-1])
-            if len(det) == 5:
-                break
-        conexion_2.close()
-        
-
-        response.text=app.template(
-            "detalle.html",context={"user": "detalle factura","detalle":det, "factura": fact })
-
-
-    
-    
-@app.ruta("/detfactura")
-def ventas(request,response):
-
-
-    # Conectar a la base de datos
-    conexion=mysql.connector.connect(host='localhost',
-                                  user='genaro',
-                                  passwd='password',
-                                  database='stock_control')
-    cursor=conexion.cursor()
-
-    # Obtener datos del formulario
-    #detalle=request.POST.get('detalle')
-    factura=request.POST.get('factura')
-    producto=request.POST.get('producto')
-    cantidad=request.POST.get('cantidad')
-    total=request.POST.get('total')
-
-    #inserto los datos a detalle de factura
-    sql="insert into detalle_factura (factura_idfactura,id_productos,cantidad,total) VALUES (%s,%s,%s,%s,%s)"
-    datos=(factura,producto,cantidad,total)
-    try:
-        cursor.execute(sql,datos)
-        conexion.commit()
-        print("insercion exitosa")
-        conexion.close()
-
-
-    except mysql.connector.Error as error:
-        print("error al insertar en la base de datos", error)
-
-    response.text=app.template(
-        "detfactura.html",context={"user": "venta exitosamente cargada"})
-
-
-
-@app.ruta("/carrito")
-def carrito(request,response):
-
-    #conexion para imprimir los productos
-    conexion= mysql.connector.connect(host='localhost',
-                                  user='genaro',
-                                  passwd='password',
-                                  database='stock_control')
-    cursor3=conexion.cursor()
-    productos=[]
-    cursor3.execute("select id_producto,nombre,precio_venta from stock")
-
-    for i in cursor3:
-        productos.append(i)
-    conexion.close()
-
-
-    id=request.POST.get('venta')
-    productos=[]
-    
-
-    response.text=app.template(
-        "carrito.html",context={"user": "CARRITO"})
-    
 
 
 
@@ -564,7 +475,7 @@ def login(request,response):
     
     if user:
         response.status_code = 302
-        response.headers['Location'] = '/'
+        response.headers['Location'] = '/homeAdmin'
         print("usuario encontrado")
     else:
         response.status_code = 404
