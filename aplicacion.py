@@ -543,3 +543,40 @@ def carrito(request,response):
         "carrito.html",context={"user": "CARRITO"})
     
 
+
+
+
+@app.ruta("/login")
+def login(request,response):
+    email=request.POST.get('email')
+    password=request.POST.get('password')
+
+    conexion= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    
+    cursor=conexion.cursor()
+
+    cursor.execute("SELECT email, password FROM usuarios WHERE email = %s", (email,))
+    user=cursor.fetchone()
+    conexion.close()
+    
+    if user:
+        response.status_code = 302
+        response.headers['Location'] = '/'
+        print("usuario encontrado")
+    else:
+        response.status_code = 404
+        response.headers['Location'] = '/login'
+
+        print("no encontrado")
+
+    response.text=app.template(
+        "ingreso.html")
+    
+@app.ruta("/logout")
+def logout(request,response):
+    response.status_code = 302
+    response.headers['Location'] = '/login'
+
