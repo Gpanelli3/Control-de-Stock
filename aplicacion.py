@@ -33,7 +33,7 @@ def productos(request, response):
 
 
 @app.ruta("/proveedores")
-def otra(request, response):
+def proveedores(request, response):
     #imprimir los proveedores
     conexion= mysql.connector.connect(host='localhost',
                                   user='genaro',
@@ -135,50 +135,25 @@ def insertar(request,response):
                                   passwd='password',
                                   database='stock_control')
     cursor=conexion.cursor()
-        
 
-    
     nombre=request.POST.get('nombre')
     proveedor=request.POST.get('proveedor')
     cat=request.POST.get('categoria')
     cantidad=request.POST.get('cantidad')
     costo=request.POST.get('costo')
 
-    nombreLow=nombre.lower()
-
-    precioInt=int(costo)
-    venta=precioInt + 3000
-
-
 
     sql="INSERT INTO stock (nombre,id_proveedor,categoria,cantidad,precio_costo,precio_venta) VALUES(%s,%s,%s,%s,%s,%s)"
-    try: 
-        datos_producto=(nombreLow,proveedor,cat,cantidad,costo,venta)
-        cursor.execute(sql,datos_producto)
-        conexion.commit()
-        response.text = app.template("update.html")
     
+    #nombreLow=nombre.lower()
 
-    except mysql.connector.Error as error:
-        print("error al actualizar en la base de datos", error)
+    #precioInt=int(costo)
+    #venta=precioInt + 3000
+
+    datos_producto=(nombre,proveedor,cat,cantidad,costo,costo)
+    cursor.execute(sql,datos_producto)
+    conexion.commit()
     conexion.close()
-
-
-
-@app.ruta("/agregarProductos")
-def agregarProducto(request,response):
-    #conexion para traer las categorias de productos
-    conexion2= mysql.connector.connect(host='localhost',
-                                  user='genaro',
-                                  passwd='password',
-                                  database='stock_control')
-    cursor2=conexion2.cursor()
-    cursor2.execute("select * from categoria")
-
-    categorias=[]
-    for i in cursor2:
-        categorias.append(i)
-    conexion2.close()
 
     #conexion para traer los proveedores 
     conexion3=mysql.connector.connect(host='localhost',
@@ -192,43 +167,20 @@ def agregarProducto(request,response):
     for i in cursor3:
         provee.append(i)
     conexion3.close()
-    response.text = app.template("agregarProducto.html", context={"proveedor":provee,"categoria":categorias})
-   
 
+    response.text = app.template("agregarProducto.html", context={"proveedor":provee})
     
 
 
 
     
-@app.ruta("/borrarProducto")
-def borrarProducto(request,response):
-    #conexion para imprimir los productos
-    conexion_2= mysql.connector.connect(host='localhost',
+@app.ruta("/borrarProductos")
+def borrarProductos(request,response):
+    conexion_3= mysql.connector.connect(host='localhost',
                                   user='genaro',
                                   passwd='password',
                                   database='stock_control')
-    cursor_2=conexion_2.cursor()
-    
-    productos=[]
-    cursor_2.execute("select id_producto,nombre,cantidad,precio_costo,precio_venta from stock order by id_producto DESC")
-
-    for i in cursor_2:
-        productos.append(i)
-    conexion_2.close()
-
-    response.text=app.template(
-        "borrarProducto.html",context={"title":"Borrar Producto", "producto":productos})
-    
-
-    
-
-@app.ruta("/delete")
-def delete(request,response):
-    conexion_2= mysql.connector.connect(host='localhost',
-                                  user='genaro',
-                                  passwd='password',
-                                  database='stock_control')
-    cursor_2=conexion_2.cursor()
+    cursor_3=conexion_3.cursor()
 
     id=request.POST.get('id')
     datId=(id,)
@@ -236,11 +188,10 @@ def delete(request,response):
     sql ="DELETE FROM detalle_factura WHERE id_productos = %s;"
     datos=(datId)
 
-    cursor_2.execute(sql,datos)
-    conexion_2.commit()
-    conexion_2.close()
+    cursor_3.execute(sql,datos)
+    conexion_3.commit()
+    conexion_3.close()
 
-    ##################DELETE
     conexion= mysql.connector.connect(host='localhost',
                                   user='genaro',
                                   passwd='password',
@@ -259,7 +210,28 @@ def delete(request,response):
     conexion.commit()
     conexion.close()
 
-    response.text=app.template("update.html")
+
+
+    #conexion para imprimir los productos
+    conexion_2= mysql.connector.connect(host='localhost',
+                                  user='genaro',
+                                  passwd='password',
+                                  database='stock_control')
+    cursor_2=conexion_2.cursor()
+    
+    productos=[]
+    cursor_2.execute("select id_producto,nombre,cantidad,precio_costo,precio_venta from stock order by id_producto DESC")
+
+    for i in cursor_2:
+        productos.append(i)
+    conexion_2.close()
+
+    
+
+    ##################DELETE
+    
+    response.text=app.template(
+        "borrarProducto.html",context={"title":"Borrar Producto", "producto":productos})
 
 
 @app.ruta("/modificar")
@@ -282,9 +254,6 @@ def modificar(request,response):
         "modificar.html",context={"producto":productos})
 
 
-    
-
-    
 
 @app.ruta("/updateProductos")
 def updateProductos(request,response):
@@ -299,18 +268,17 @@ def updateProductos(request,response):
 
     nombre=request.POST.get('id')
     costo=request.POST.get('costo')
-    cantidad=request.POST.get('cantidad')
 
     costInt=int(costo)
-    venta=costInt + 3000
+    venta=(costInt*1.30)
 
     sql="update stock set precio_costo=%s, precio_venta=%s where nombre =%s"
-
     
     try:
         datos=(costo,venta, nombre)
 
         cursor2.execute(sql,datos)
+
         conexion2.commit()
         
         print("actualizacion correcta")
@@ -321,7 +289,7 @@ def updateProductos(request,response):
 
         conexion2.close()
     response.text=app.template(
-        "update.html")
+        "update.html", context={"mensage":"actualizacion correcta"})
 
 
 

@@ -20,7 +20,7 @@
                   <a class="nav-link" href="./agregarProductos">AGREGAR PRODUCTOS</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="./borrarProducto">BORRAR PRODUCTOS</a>
+                  <a class="nav-link" href="./borrarProductos">BORRAR PRODUCTOS</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="./proveedores">PROVEEDORES</a>
@@ -59,27 +59,10 @@
             </table>
           </div>
         </div>
+      </div>
   
       
-      <div class="col">
-        <div>
-          <table border="2" class="table">
-            <tr>
-              <td>ID CATEGORIA</td>
-              <td>TIPO DE CATEGORIA</td>
-            </tr>
-            
-            {% for i in categoria %}
-                <tr>
-                  {%for val in i%}
-                    <td>{{val}}</td>
-                  {% endfor %}
-                </tr>
-            {% endfor %}
-          </table>
-        </div>
-      </div>
-      </div>
+      
       <div class="col">
         <div class="container text-center">
             <div class="col">
@@ -92,13 +75,22 @@
             
                     <label for="proveedor">proveedor:</label>
                     <input type="number" id="proveedor" name="proveedor"><br><br>
-            
-                    <label for="categoria">CATEGORIA:</label>
-                    <input type="number" id="categoria" name="categoria"><br><br>
-            
+
+                    <p>CATEGORIA</P>
+                    <input type="radio" name="categoria" value="1"> Alchool +50%<br>
+                    <input type="radio" name="categoria" value="2" > Gaseosas<br>
+                    <input type="radio" name="categoria" value="3"> Bebidas Energizantes<br>
+                    <input type="radio" name="categoria" value="4"> Cervezas<br>
+                    <input type="radio" name="categoria" value="5"> Jugos<br>
+                    <input type="radio" name="categoria" value="6"> Cigarrillos<br>
+                    <input type="radio" name="categoria" value="7" > Frituras<br>
+                    <input type="radio" name="categoria" value="8"> Chicles<br>
+                    <input type="radio" name="categoria" value="9"> Aguas<br>
+                    <input type="radio" name="categoria" value="10"> Vinos<br>
+                    <br>
                     <label for="cantidad">CANTIDAD:</label>
                     <input type="number" id="cantidad" name="cantidad"><br><br>
-            
+                    <br>
                     <label for="costo">PRECIO COSTO:</label>
                     <input type="number" id="costo" name="costo"><br><br>
           
